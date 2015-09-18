@@ -1,0 +1,93 @@
+####################################
+#                                  #
+#   Thomas Lillis -- Assignment 3  #
+#                                  #
+####################################
+
+To run program:
+
+python Astar.py *world* *heuristic*
+
+Worlds:
+    World1.txt
+    World2.txt
+
+Heuristics:
+    man
+    tom
+
+
+Example:
+
+python Astar.py World1.txt man
+python Astar.py World1.txt tom
+python Astar.py World2.txt mam
+python Astar.py World2.txt tom
+
+
+####################################
+
+
+My heuristic was similar to the man heuristic except I gave it more weight.
+I thought this may help because it would give a large amount of push
+towards the direction of the ending finishing node of the graph.
+This reduced the number of edges checked vs the man hueristic.
+
+Equation:
+
+h = 5*((ENDING_NODE_X - node.x) + (ENDING_NODE_Y - node.y))
+
+Performance:
+
+            NODES EVALUATED
+
+            man         tom
+world1      60          62
+
+world2      59          50
+
+
+                PATHS
+
+paths remained the same
+
+world1-man:
+0 0 0 0 1 0 1 1 - -  
+2 2 1 1 0 0 2 - 2 0  
+0 0 0 0 0 0 2 - 0 0  
+2 0 2 2 0 - - 0 2 0  
+0 0 2 0 - 2 1 0 1 0  
+0 0 2 0 - 2 0 0 2 0  
+0 0 2 - 1 2 0 1 2 2  
+- - - 0 0 0 0 0 0 0 
+
+world1-tom:
+0 0 0 0 1 0 1 1 - -  
+2 2 1 1 0 0 2 - 2 0  
+0 0 0 0 0 0 2 - 0 0  
+2 0 2 2 0 - - 0 2 0  
+0 0 2 0 - 2 1 0 1 0  
+0 0 2 0 - 2 0 0 2 0  
+0 0 2 - 1 2 0 1 2 2  
+- - - 0 0 0 0 0 0 0 
+
+world2-man:
+0 0 0 0 0 0 0 0 0 -  
+2 2 1 1 0 2 2 1 - 0  
+0 0 0 0 0 2 2 - 1 0  
+2 2 2 2 0 - - 1 1 0  
+0 0 0 0 - 2 1 1 1 0  
+0 2 2 - 2 2 0 0 2 0  
+0 0 2 - 1 2 0 1 2 2  
+- - - 0 0 0 0 0 0 0
+
+world2-tom:
+0 0 0 0 0 0 0 0 0 -  
+2 2 1 1 0 2 2 1 - 0  
+0 0 0 0 0 2 2 - 1 0  
+2 2 2 2 0 - - 1 1 0  
+0 0 0 0 - 2 1 1 1 0  
+0 2 2 - 2 2 0 0 2 0  
+0 0 2 - 1 2 0 1 2 2  
+- - - 0 0 0 0 0 0 0
+
