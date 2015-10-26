@@ -16,7 +16,7 @@ python MDP.py World1MDP.txt .5
 I ran the MDP with 4 different values for e.
 I started with .5 and then .001. These paths were
 the same because the utilities leveled out and
-stoped changing but still chnaged slighty enough
+stoped changing but still changed slighty enough
 to keep the MDP running. Not enough chnage to change
 the path. I then next ran it with the value 5. This
 decreased the number of iterations and changed the path.
