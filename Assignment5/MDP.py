@@ -132,9 +132,9 @@ while exit_value > float(epsilon)*(1-gama)/gama:
                     maximum = max(utilities.values())
                     #print utilities.values()
                     #print maximum,x,y
-                    for nextnode, value in utilities.iteritems():
-                        if value == maximum:
-                            node.next_dir = nextnode
+                    #for nextnode, value in utilities.iteritems():
+                    #    if value == maximum:
+                    #        node.next_dir = nextnode
                     node.utility = maximum*gama + node.sqr_value
                     exit.append(node.utility-node.last_utility)
 
