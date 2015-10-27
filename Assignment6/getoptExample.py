@@ -141,13 +141,25 @@ class BayesNet():
             if node_a.parents == None: # node_a is a top node
                 return self.calcConditional(b,a) * self.calcMarginal(a) / self.calcMarginal(b) # bayes
             elif node_b.parents == None: # node_b is a top node
-                if node_b.letter == 's':
+                if node_b.letter == 's' and '~' in b:
+                    if '~' in a:
+                        prob = (1-node_a.conditional['p~s'])*self.calcMarginal('p') + (1-node_a.conditional['~p~s'])*self.calcMarginal('~p')
+                    else:
+                        prob = node_a.conditional['p~s']*self.calcMarginal('p') + node_a.conditional['~p~s']*self.calcMarginal('~p')
+                    return prob
+                if node_b.letter == 's' and '~' not in b:
                     if '~' in a:
                         prob = (1-node_a.conditional['ps'])*self.calcMarginal('p') + (1-node_a.conditional['~ps'])*self.calcMarginal('~p')
                     else:
                         prob = node_a.conditional['ps']*self.calcMarginal('p') + node_a.conditional['~ps']*self.calcMarginal('~p')
                     return prob
-                if node_b.letter == 'p':
+                if node_b.letter == 'p' and '~' in b:
+                    if '~' in a:
+                        prob = (1-node_a.conditional['~ps'])*self.calcMarginal('s') + (1-node_a.conditional['~p~s'])*self.calcMarginal('~s')
+                    else:
+                        prob = node_a.conditional['~ps']*self.calcMarginal('s') + node_a.conditional['~p~s']*self.calcMarginal('~s')
+                    return prob
+                if node_b.letter == 'p' and '~' not in b:
                     if '~' in a:
                         prob = (1-node_a.conditional['ps'])*self.calcMarginal('s') + (1-node_a.conditional['p~s'])*self.calcMarginal('~s')
                     else:
