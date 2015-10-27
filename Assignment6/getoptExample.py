@@ -1,4 +1,10 @@
 import getopt, sys
+###############################################
+#                                             #
+#  WARNING: This code is very gross...sorry!  #
+#                                             #
+###############################################
+
 class Node():
     def __init__(self,letter,pt=None,pf=None):
         self.pt = pt
@@ -103,11 +109,18 @@ class BayesNet():
             return 1
         if node_a.letter == node_c.letter:
             return 1
-    
-        if node_c.children[0].letter = node_b.letter:
-            pass
-        if node_b.children[0].letter = node_c.letter:
-            pass
+        
+        if node_a.children == None:
+            if node_c.children != None and node_c.children[0].letter == node_b.letter:
+                if node_c.parents == None: # node_c doesn't matter because node_b already happened
+                    return self.calcConditional(a,b_list[0])
+                else:
+                    pass
+            if node_b.children != None and node_b.children[0].letter == node_c.letter:
+                if node_b.parents == None: # node_b doesn't matter because node_c already happened
+                    return self.calcConditional(a,b_list[1])
+                else:
+                    pass
         return 0
 
     def calcConditional(self,a,b):
