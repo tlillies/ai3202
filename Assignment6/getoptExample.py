@@ -8,6 +8,19 @@ class Node():
         self.conditional = {}
         self.letter = letter
 
+def convertToArray(string):
+    array = []
+    isTilda = False
+    for s in string:
+        if s is not '~' and not isTilda:
+            array.append(s)
+        elif s is '~':
+            isTilda = True
+        elif isTilda:
+            array.append('~' + s)
+            isTilda = False
+    return array
+
 def makeGraph():
     graph = {}
     P = Node('p',.9,.1)
@@ -81,8 +94,25 @@ class BayesNet():
         else:
             print "Tried to get marginal of non-singular value"
 
+    def calcConditionalExtended(self,a,b):
+        node_a = self.graph[a]
+        b_list = convertToArray(b)
+        node_b = self.graph[b_list[0]]
+        node_c = self.graph[b_list[1]]
+        if node_a.letter == node_b.letter:
+            return 1
+        if node_a.letter == node_c.letter:
+            return 1
+    
+        if node_c.children[0].letter = node_b.letter:
+            pass
+        if node_b.children[0].letter = node_c.letter:
+            pass
+        return 0
 
     def calcConditional(self,a,b):
+        if len(b.replace('~','')) > 1:
+            return self.calcConditionalExtended(a,b)
         node_a = self.graph[a]
         node_b = self.graph[b]
         if node_a.letter == node_b.letter:
@@ -95,14 +125,14 @@ class BayesNet():
                 return node_a.pt
 
         elif node_a.letter == 'c' or node_b.letter == 'c': # nodes include c
-            if node_b.parents == None: # node_b is a top node
+            if node_a.parents == None: # node_a is a top node
                 return self.calcConditional(b,a) * self.calcMarginal(a) / self.calcMarginal(b) # bayes
-            elif node_a.parents == None: # node_a is a top node
-                if node_a.letter == 's':
-                    prob = node_b.conditional['ps']*self.calcMarginal('p') + node_b.conditional['~ps']*self.calcMarginal('~p')
+            elif node_b.parents == None: # node_b is a top node
+                if node_b.letter == 's':
+                    prob = node_a.conditional['ps']*self.calcMarginal('p') + node_a.conditional['~ps']*self.calcMarginal('~p')
                     return prob
-                if node_a.letter == 'p':
-                    prob = node_b.conditional['ps']*self.calcMarginal('s') + node_b.conditional['p~s']*self.calcMarginal('~s')
+                if node_b.letter == 'p':
+                    prob = node_a.conditional['ps']*self.calcMarginal('s') + node_a.conditional['p~s']*self.calcMarginal('~s')
                     return prob
             else: # node_a or node_b is a bottom node
                 if node_a.letter == 'c': # node_a is c
@@ -115,6 +145,8 @@ class BayesNet():
         else: # nodes are two apart
             prob = self.calcConditional(a,'c')*self.calcConditional('c',b)+self.calcConditional(a,'~c')*self.calcConditional('~c',b)
             return prob
+
+    
             
     def calcJoint(self,a):
         return
@@ -139,7 +171,9 @@ def main():
             print "flag", o
             print "args", a
             print type(a)
-            print net.calcMarginal(a)
+            print net.calcMarginal(a.lower())
+            if a.isupper():
+                print net.calcMarginal('~'+a.lower())
         elif o in ("-g"):
             print "flag", o
             print "args", a
@@ -154,6 +188,11 @@ def main():
         elif o in ("-j"):
             print "flag", o
             print "args", a
+            """
+            for i in range(0,len(a)):
+                if a[i].isupper:
+                    calcJoint(a[:i] + '~' + a[i:])
+            """
         elif o in ("-a"):
             print "Expected:"
             print("    None  D=T   S=T   C=T   C&S=T D&S=T")
@@ -166,11 +205,11 @@ def main():
             print "Got:"
             print ""
             print("    None  D=T   S=T   C=T   C&S=T D&S=T")
-            print("P=F {:.3f} {:.3f} {:.3f} {:.3f} {:.3f} {:.3f}".format(net.calcMarginal('~p'),net.calcConditional('~p','d'),net.calcConditional('~p','s'),net.calcConditional('~p','c'),0,0))
-            print("S=T {0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f}".format(net.calcMarginal('s'),net.calcConditional('s','d'),net.calcConditional('s','s'),net.calcConditional('s','c'),0,0))
-            print("C=T {0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f}".format(net.calcMarginal('c'),net.calcConditional('c','d'),net.calcConditional('c','s'),net.calcConditional('c','c'),0,0))
-            print("X=T {0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f}".format(net.calcMarginal('x'),net.calcConditional('x','d'),net.calcConditional('x','s'),net.calcConditional('x','c'),0,0))
-            print("D=T {0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f}".format(net.calcMarginal('d'),net.calcConditional('d','d'),net.calcConditional('d','s'),net.calcConditional('d','c'),0,0))
+            print("P=F {:.3f} {:.3f} {:.3f} {:.3f} {:.3f} {:.3f}".format(net.calcMarginal('~p'),net.calcConditional('~p','d'),net.calcConditional('~p','s'),net.calcConditional('~p','c'),net.calcConditional('~p','cs'),net.calcConditional('~p','ds')))
+            print("S=T {0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f}".format(net.calcMarginal('s'),net.calcConditional('s','d'),net.calcConditional('s','s'),net.calcConditional('s','c'),net.calcConditional('s','cs'),net.calcConditional('s','ds')))
+            print("C=T {0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f}".format(net.calcMarginal('c'),net.calcConditional('c','d'),net.calcConditional('c','s'),net.calcConditional('c','c'),net.calcConditional('c','cs'),net.calcConditional('c','ds')))
+            print("X=T {0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f}".format(net.calcMarginal('x'),net.calcConditional('x','d'),net.calcConditional('x','s'),net.calcConditional('x','c'),net.calcConditional('x','cs'),net.calcConditional('x','ds')))
+            print("D=T {0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f}".format(net.calcMarginal('d'),net.calcConditional('d','d'),net.calcConditional('d','s'),net.calcConditional('d','c'),net.calcConditional('d','cs'),net.calcConditional('d','ds')))
             print ""
         else:
             assert False, "unhandled option"
