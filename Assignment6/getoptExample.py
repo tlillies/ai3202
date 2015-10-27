@@ -142,10 +142,16 @@ class BayesNet():
                 return self.calcConditional(b,a) * self.calcMarginal(a) / self.calcMarginal(b) # bayes
             elif node_b.parents == None: # node_b is a top node
                 if node_b.letter == 's':
-                    prob = node_a.conditional['ps']*self.calcMarginal('p') + node_a.conditional['~ps']*self.calcMarginal('~p')
+                    if '~' in a:
+                        prob = (1-node_a.conditional['ps'])*self.calcMarginal('p') + (1-node_a.conditional['~ps'])*self.calcMarginal('~p')
+                    else:
+                        prob = node_a.conditional['ps']*self.calcMarginal('p') + node_a.conditional['~ps']*self.calcMarginal('~p')
                     return prob
                 if node_b.letter == 'p':
-                    prob = node_a.conditional['ps']*self.calcMarginal('s') + node_a.conditional['p~s']*self.calcMarginal('~s')
+                    if '~' in a:
+                        prob = (1-node_a.conditional['ps'])*self.calcMarginal('s') + (1-node_a.conditional['p~s'])*self.calcMarginal('~s')
+                    else:
+                        prob = node_a.conditional['ps']*self.calcMarginal('s') + node_a.conditional['p~s']*self.calcMarginal('~s')
                     return prob
             else: # node_a or node_b is a bottom node
                 if node_a.letter == 'c': # node_a is c
@@ -154,6 +160,7 @@ class BayesNet():
                 else: # node_b is c
                     prob = node_a.conditional[b]
                     return prob
+            return 0
 
         else: # nodes are two apart
             prob = self.calcConditional(a,'c')*self.calcConditional('c',b)+self.calcConditional(a,'~c')*self.calcConditional('~c',b)
