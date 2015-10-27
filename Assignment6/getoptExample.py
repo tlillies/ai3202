@@ -83,13 +83,45 @@ class BayesNet():
 
 
     def calcConditional(self,a,b):
-        return
+        node_a = self.graph[a]
+        node_b = self.graph[b]
+        if node_a.letter == node_b.letter:
+            return 1
+
+        if node_a.parents == None and node_b.parents == None: # two top nodes
+            if '~' in a:
+                return node_a.pf
+            else:
+                return node_a.pt
+
+        elif node_a.letter == 'c' or node_b.letter == 'c': # nodes include c
+            if node_b.parents == None: # node_b is a top node
+                return self.calcConditional(b,a) * self.calcMarginal(a) / self.calcMarginal(b) # bayes
+            elif node_a.parents == None: # node_a is a top node
+                if node_a.letter == 's':
+                    prob = node_b.conditional['ps']*self.calcMarginal('p') + node_b.conditional['~ps']*self.calcMarginal('~p')
+                    return prob
+                if node_a.letter == 'p':
+                    prob = node_b.conditional['ps']*self.calcMarginal('s') + node_b.conditional['p~s']*self.calcMarginal('~s')
+                    return prob
+            else: # node_a or node_b is a bottom node
+                if node_a.letter == 'c': # node_a is c
+                    prob = node_b.conditional[a] * self.calcMarginal(a) / self.calcMarginal(b) # bayes
+                    return prob
+                else: # node_b is c
+                    prob = node_a.conditional[b]
+                    return prob
+
+        else: # nodes are two apart
+            prob = self.calcConditional(a,'c')*self.calcConditional('c',b)+self.calcConditional(a,'~c')*self.calcConditional('~c',b)
+            return prob
+            
     def calcJoint(self,a):
         return
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "m:g:j:p:")
+        opts, args = getopt.getopt(sys.argv[1:], "m:g:j:p:a:")
     except getopt.GetoptError as err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
@@ -122,6 +154,24 @@ def main():
         elif o in ("-j"):
             print "flag", o
             print "args", a
+        elif o in ("-a"):
+            print "Expected:"
+            print("    None  D=T   S=T   C=T   C&S=T D&S=T")
+            print("P=F 0.100 0.102 0.100 0.249 0.156 0.102")
+            print("S=T 0.300 0.307 1.000 0.825 1.000 1.000")
+            print("C=T 0.011 0.025 0.032 1.000 1.000 0.067")
+            print("X=T 0.208 0.217 0.222 0.900 0.900 0.247")
+            print("D=T 0.304 1.000 0.311 0.650 0.650 1.000")
+            print ""
+            print "Got:"
+            print ""
+            print("    None  D=T   S=T   C=T   C&S=T D&S=T")
+            print("P=F {:.3f} {:.3f} {:.3f} {:.3f} {:.3f} {:.3f}".format(net.calcMarginal('~p'),net.calcConditional('~p','d'),net.calcConditional('~p','s'),net.calcConditional('~p','c'),0,0))
+            print("S=T {0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f}".format(net.calcMarginal('s'),net.calcConditional('s','d'),net.calcConditional('s','s'),net.calcConditional('s','c'),0,0))
+            print("C=T {0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f}".format(net.calcMarginal('c'),net.calcConditional('c','d'),net.calcConditional('c','s'),net.calcConditional('c','c'),0,0))
+            print("X=T {0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f}".format(net.calcMarginal('x'),net.calcConditional('x','d'),net.calcConditional('x','s'),net.calcConditional('x','c'),0,0))
+            print("D=T {0:.3f} {1:.3f} {2:.3f} {3:.3f} {4:.3f} {5:.3f}".format(net.calcMarginal('d'),net.calcConditional('d','d'),net.calcConditional('d','s'),net.calcConditional('d','c'),0,0))
+            print ""
         else:
             assert False, "unhandled option"
             # ...
