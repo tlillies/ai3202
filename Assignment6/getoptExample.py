@@ -165,6 +165,7 @@ class BayesNet():
         return
 
 def main():
+    p_print = 1
     try:
         opts, args = getopt.getopt(sys.argv[1:], "m:g:j:p:a:")
     except getopt.GetoptError as err:
@@ -179,6 +180,10 @@ def main():
             print a[0]
             print float(a[1:])
             #setting the prior here works if the Bayes net is already built
+            if float(a[1:]) == .5:
+                p_print = 2
+            else:
+                p_print = 0
             print net.setPrior(a[0], float(a[1:]))
         elif o in ("-m"):
             print "flag", o
@@ -207,13 +212,23 @@ def main():
                     calcJoint(a[:i] + '~' + a[i:])
             """
         elif o in ("-a"):
+            print ""
             print "Expected:"
-            print("    None  D=T   S=T   C=T   C&S=T D&S=T")
-            print("P=F 0.100 0.102 0.100 0.249 0.156 0.102")
-            print("S=T 0.300 0.307 1.000 0.825 1.000 1.000")
-            print("C=T 0.011 0.025 0.032 1.000 1.000 0.067")
-            print("X=T 0.208 0.217 0.222 0.900 0.900 0.247")
-            print("D=T 0.304 1.000 0.311 0.650 0.650 1.000")
+            print ""
+            if p_print == 1:
+                print("    None  D=T   S=T   C=T   C&S=T D&S=T")
+                print("P=F 0.100 0.102 0.100 0.249 0.156 0.102")
+                print("S=T 0.300 0.307 1.000 0.825 1.000 1.000")
+                print("C=T 0.011 0.025 0.032 1.000 1.000 0.067")
+                print("X=T 0.208 0.217 0.222 0.900 0.900 0.247")
+                print("D=T 0.304 1.000 0.311 0.650 0.650 1.000")
+            if p_print == 2:
+                print("    None  D=T   S=T   C=T   C&S=T D&S=T")
+                print("P=F 0.100 0.102 0.100 0.201 0.156 0.102")
+                print("S=T 0.500 0.508 1.000 0.917 1.000 1.000")
+                print("C=T 0.174 0.037 0.032 1.000 1.000 0.067")
+                print("X=T 0.212 0.226 0.311 0.900 0.900 0.247")
+                print("D=T 0.306 1.000 0.222 0.650 0.650 1.000")
             print ""
             print "Got:"
             print ""
