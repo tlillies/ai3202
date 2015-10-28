@@ -108,29 +108,58 @@ class BayesNet():
         node_b = self.graph[b]
         node_c = self.graph[c]
 
+        if node_a.letter == node_b.letter:
+            return 1
+        if node_a.letter == node_c.letter:
+            return 1
+
         if node_a.letter == 'c':
             if node_b.letter == 's' and node_c.letter == 'p':
                 if '~' in b: # not s
                     if '~' in c: # not p
-                        return node_a.conditional['~p~s']
+                        if '~' in a:
+                            return 1-node_a.conditional['~p~s']
+                        else:
+                            return node_a.conditional['~p~s']
                     else: # p 
-                        return node_a.conditional['p~s']
+                        if '~' in a:
+                            return 1-node_a.conditional['p~s']
+                        else:
+                            return node_a.conditional['p~s']
                 else: # s
                     if '~' in c: # not p
-                        return node_a.conditional['~ps']
+                        if '~' in a:
+                            return 1-node_a.conditional['~ps']
+                        else:
+                            return node_a.conditional['~ps']
                     else: # p
-                        return node_a.conditional['ps']
+                        if '~' in a:
+                            return 1-node_a.conditional['ps']
+                        else:
+                            return node_a.conditional['ps']
             if node_c.letter == 's' and node_b.letter == 'p':
                 if '~' in b: # not p
                     if '~' in c: # not s
-                        return node_a.conditional['~p~s']
+                        if '~' in a:
+                            return 1-node_a.conditional['~p~s']
+                        else:
+                            return node_a.conditional['~p~s']
                     else: # s
-                        return node_a.conditional['~ps']
+                        if '~' in a:
+                            return 1-node_a.conditional['~ps']
+                        else:
+                            return node_a.conditional['~ps']
                 else: # p
                     if '~' in c: # not s
-                        return node_a.conditional['p~s']
+                        if '~' in a:
+                            return 1-node_a.conditional['p~s']
+                        else:
+                            return node_a.conditional['p~s']
                     else: # s
-                        return node_a.conditional['ps']
+                        if '~' in a:
+                            return 1-node_a.conditional['ps']
+                        else:
+                            return node_a.conditional['ps']
         #print a+b
         #print b
         #print self.calcJoint(a+b)
@@ -203,7 +232,10 @@ class BayesNet():
                     prob = node_b.conditional[a] * self.calcMarginal(a) / self.calcMarginal(b) # bayes
                     return prob
                 else: # node_b is c
-                    prob = node_a.conditional[b]
+                    if '~' in a:
+                        prob = 1-node_a.conditional[b]
+                    else:
+                        prob = node_a.conditional[b]
                     return prob
             return 0
 
@@ -216,11 +248,14 @@ class BayesNet():
         a = convertToArray(a)
         def jointHelper(b):
             p = 1
+            print b
             for i in b:
                 if self.graph[i].parents is not None and len(self.graph[i].parents) > 0:
                     p *= self.calcConditional(i,''.join([b.letter for b in self.graph[i].parents]))
+                    print p
                 else:
                     p *= self.calcMarginal(i)
+                    #print p
             return p
 
         ret = 0
@@ -272,14 +307,6 @@ class BayesNet():
                     final_list[i] = '~' + node_order[i]
             #print final_list
             ret += jointHelper(final_list)
-        """        
-        for combo in itertools.permutations(notInJoint,length):
-            copy = set(list(s.replace('~','') for s in combo))
-            if len(copy) == length:
-                print a+list(combo)
-                #print combo
-                ret += jointHelper(a+list(combo))
-        """                                                                                                                    
         return ret 
 
 def main():
