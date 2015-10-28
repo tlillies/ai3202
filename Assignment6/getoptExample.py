@@ -113,27 +113,65 @@ class BayesNet():
         if node_a.letter == node_c.letter:
             return 1
 
+
+
+        """
+        depchain = self.findDepChain(b[0],b[1])
+        rootParentEvidence = b[1]
+        if depChain is not None and len(depChain) == 1:
+            pass
+        else:
+            rootParentEvidence = b[0]
+            depChain = self.findDepChain(b[1],b[0])
+
+        if depChain is not None and len(depChain) == 1:
+            a = a[0]
+            root = b[0]
+                                                             
+        if(b[1] in [s.L for s in self.graph[root].Parents]):
+            if(a in [s.L for s in self.graph[root].Children]):
+                return self.calcSingleConditional(a,root)
+            elif(a in [s.L for s in self.graph[root].Parents]):
+                return self.calcSingleConditional(a,b[1])
+
+            notRoot = [a, rootParentEvidence]
+
+            probability = self.calcMarginal(a)
+            probability *= self.graph[root].Conditional.get(notRoot[0]+notRoot[1], self.graph[root].Conditional.get(notRoot[1]+notRoot[0], False))
+            probability /= self.calcSingleConditional(root,rootParentEvidence)
+
+            return probability
+
+        return self.calcJoint(a + b)/self.calcJoint(b)
+        """
+
+
+
         if node_a.letter == 'c':
             if node_b.letter == 's' and node_c.letter == 'p':
                 if '~' in b: # not s
                     if '~' in c: # not p
                         if '~' in a:
+                            return node_a.conditional['~p~s']
                             return 1-node_a.conditional['~p~s']
                         else:
                             return node_a.conditional['~p~s']
                     else: # p 
                         if '~' in a:
+                            return node_a.conditional['p~s']
                             return 1-node_a.conditional['p~s']
                         else:
                             return node_a.conditional['p~s']
                 else: # s
                     if '~' in c: # not p
                         if '~' in a:
+                            return node_a.conditional['~ps']
                             return 1-node_a.conditional['~ps']
                         else:
                             return node_a.conditional['~ps']
                     else: # p
                         if '~' in a:
+                            return node_a.conditional['ps']
                             return 1-node_a.conditional['ps']
                         else:
                             return node_a.conditional['ps']
@@ -141,29 +179,32 @@ class BayesNet():
                 if '~' in b: # not p
                     if '~' in c: # not s
                         if '~' in a:
+                            return node_a.conditional['~p~s']
                             return 1-node_a.conditional['~p~s']
                         else:
                             return node_a.conditional['~p~s']
                     else: # s
                         if '~' in a:
+                            return node_a.conditional['~ps']
                             return 1-node_a.conditional['~ps']
                         else:
                             return node_a.conditional['~ps']
                 else: # p
                     if '~' in c: # not s
                         if '~' in a:
+                            return node_a.conditional['p~s']
                             return 1-node_a.conditional['p~s']
                         else:
                             return node_a.conditional['p~s']
                     else: # s
                         if '~' in a:
+                            return node_a.conditional['ps']
                             return 1-node_a.conditional['ps']
                         else:
                             return node_a.conditional['ps']
-        #print a+b
-        #print b
-        #print self.calcJoint(a+b)
-        #print self.calcJoint(b)
+        
+        
+        
         return self.calcJoint(a+b)/self.calcJoint(b)
         """
         if node_a.letter == node_b.letter:
@@ -229,7 +270,10 @@ class BayesNet():
                     return prob
             else: # node_a or node_b is a bottom node
                 if node_a.letter == 'c': # node_a is c
-                    prob = node_b.conditional[a] * self.calcMarginal(a) / self.calcMarginal(b) # bayes
+                    if '~' in b:
+                        prob = (1-node_b.conditional[a]) * self.calcMarginal(a) / self.calcMarginal(b) # bayes
+                    else:
+                        prob = node_b.conditional[a] * self.calcMarginal(a) / self.calcMarginal(b) # bayes
                     return prob
                 else: # node_b is c
                     if '~' in a:
@@ -248,14 +292,16 @@ class BayesNet():
         a = convertToArray(a)
         def jointHelper(b):
             p = 1
-            print b
+            #print b
             for i in b:
                 if self.graph[i].parents is not None and len(self.graph[i].parents) > 0:
                     p *= self.calcConditional(i,''.join([b.letter for b in self.graph[i].parents]))
-                    print p
+                    print("{0} | {1} = {2}".format(i,''.join([b.letter for b in self.graph[i].parents]),self.calcConditional(i,''.join([b.letter for b in self.graph[i].parents]))))
+                    #print p
                 else:
                     p *= self.calcMarginal(i)
                     #print p
+            print p
             return p
 
         ret = 0
