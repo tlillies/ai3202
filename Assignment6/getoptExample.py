@@ -103,16 +103,18 @@ class BayesNet():
     def calcConditionalExtended(self,a,b):
         node_a = self.graph[a]
         b_list = convertToArray(b)
+        b_start = b
         b = b_list[0]
         c = b_list[1]
         node_b = self.graph[b]
         node_c = self.graph[c]
 
+        """
         if node_a.letter == node_b.letter:
             return 1
         if node_a.letter == node_c.letter:
             return 1
-
+        """
 
 
         """
@@ -203,9 +205,11 @@ class BayesNet():
                         else:
                             return node_a.conditional['ps']
         
+        #print a+b_start
+        #print b_start
+        #print ""
         
-        
-        return self.calcJoint(a+b)/self.calcJoint(b)
+        return self.calcJoint(a+b_start)/self.calcJoint(b_start)
         """
         if node_a.letter == node_b.letter:
             return 1
@@ -290,6 +294,7 @@ class BayesNet():
 
     def calcJoint(self,a):
         a = convertToArray(a)
+        a = list(set(a))
         def jointHelper(b):
             p = 1
             #print b
@@ -299,6 +304,7 @@ class BayesNet():
                     print("{0} | {1} = {2}".format(i,''.join([b.letter for b in self.graph[i].parents]),self.calcConditional(i,''.join([b.letter for b in self.graph[i].parents]))))
                     #print p
                 else:
+                    print i
                     p *= self.calcMarginal(i)
                     #print p
             print p
@@ -307,7 +313,8 @@ class BayesNet():
         ret = 0
         notInJoint = []
         notInJoint =  list(set([str(s).replace('~','') for s in self.graph.keys()]))
-        for i in a:
+        a_clean = list(set(str(node).replace('~','') for node in a))
+        for i in a_clean:
             if i in notInJoint:
                 notInJoint.remove(i)
 
@@ -339,6 +346,10 @@ class BayesNet():
         #print len(final_bits)
 
         # Make list of out bits
+        #print "a:"
+        #print a
+        #print 'Not in joint:'
+        #print notInJoint
         node_order.reverse()
         string_list = []
         final_list = [0,0,0,0,0]
@@ -348,11 +359,17 @@ class BayesNet():
             #print string
             for i in range(len(string)):
                 if string_list[i] == '1':
-                    final_list[i] = node_order[i]
+                    if node_order[i] in (a+notInJoint):
+                        final_list[i] = node_order[i]
+                    else:
+                        final_list[i] = '~' + node_order[i]
+                    #final_list[i] = node_order[i]
                 elif string_list[i] == '0':
                     final_list[i] = '~' + node_order[i]
             #print final_list
             ret += jointHelper(final_list)
+        print ret
+        print ""
         return ret 
 
 def main():
