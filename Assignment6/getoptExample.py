@@ -115,40 +115,8 @@ class BayesNet():
         if node_a.letter == node_c.letter:
             return 1
         """
-
-
-        """
-        depchain = self.findDepChain(b[0],b[1])
-        rootParentEvidence = b[1]
-        if depChain is not None and len(depChain) == 1:
-            pass
-        else:
-            rootParentEvidence = b[0]
-            depChain = self.findDepChain(b[1],b[0])
-
-        if depChain is not None and len(depChain) == 1:
-            a = a[0]
-            root = b[0]
-                                                             
-        if(b[1] in [s.L for s in self.graph[root].Parents]):
-            if(a in [s.L for s in self.graph[root].Children]):
-                return self.calcSingleConditional(a,root)
-            elif(a in [s.L for s in self.graph[root].Parents]):
-                return self.calcSingleConditional(a,b[1])
-
-            notRoot = [a, rootParentEvidence]
-
-            probability = self.calcMarginal(a)
-            probability *= self.graph[root].Conditional.get(notRoot[0]+notRoot[1], self.graph[root].Conditional.get(notRoot[1]+notRoot[0], False))
-            probability /= self.calcSingleConditional(root,rootParentEvidence)
-
-            return probability
-
-        return self.calcJoint(a + b)/self.calcJoint(b)
-        """
-
-
-
+        
+        # Handle all c|ps cases given
         if node_a.letter == 'c':
             if node_b.letter == 's' and node_c.letter == 'p':
                 if '~' in b: # not s
@@ -177,6 +145,7 @@ class BayesNet():
                             return 1-node_a.conditional['ps']
                         else:
                             return node_a.conditional['ps']
+
             if node_c.letter == 's' and node_b.letter == 'p':
                 if '~' in b: # not p
                     if '~' in c: # not s
@@ -208,27 +177,9 @@ class BayesNet():
         #print a+b_start
         #print b_start
         #print ""
-        
+
+        # Handle every other case
         return self.calcJoint(a+b_start)/self.calcJoint(b_start)
-        """
-        if node_a.letter == node_b.letter:
-            return 1
-        if node_a.letter == node_c.letter:
-            return 1
-        
-        if node_a.children == None:
-            if node_c.children != None and node_c.children[0].letter == node_b.letter:
-                if node_c.parents == None: # node_c doesn't matter because node_b already happened
-                    return self.calcConditional(a,b_list[0])
-                else:
-                    pass
-            if node_b.children != None and node_b.children[0].letter == node_c.letter:
-                if node_b.parents == None: # node_b doesn't matter because node_c already happened
-                    return self.calcConditional(a,b_list[1])
-                else:
-                    pass
-        """
-        return 0
 
     def calcConditional(self,a,b):
         if len(b.replace('~','')) > 1:
@@ -295,7 +246,7 @@ class BayesNet():
     def calcJoint(self,a):
         a = convertToArray(a)
         a = list(set(a))
-        def jointHelper(b):
+        def jointHelper(b): # Do the actual calculation given the list
             p = 1
             #print b
             for i in b:
