@@ -154,26 +154,26 @@ class BayesNet():
                 if '~' in b: # not s
                     if '~' in c: # not p
                         if '~' in a:
-                            return node_a.conditional['~p~s']
+                            #return node_a.conditional['~p~s']
                             return 1-node_a.conditional['~p~s']
                         else:
                             return node_a.conditional['~p~s']
                     else: # p 
                         if '~' in a:
-                            return node_a.conditional['p~s']
+                            #return node_a.conditional['p~s']
                             return 1-node_a.conditional['p~s']
                         else:
                             return node_a.conditional['p~s']
                 else: # s
                     if '~' in c: # not p
                         if '~' in a:
-                            return node_a.conditional['~ps']
+                            #return node_a.conditional['~ps']
                             return 1-node_a.conditional['~ps']
                         else:
                             return node_a.conditional['~ps']
                     else: # p
                         if '~' in a:
-                            return node_a.conditional['ps']
+                            #return node_a.conditional['ps']
                             return 1-node_a.conditional['ps']
                         else:
                             return node_a.conditional['ps']
@@ -181,26 +181,26 @@ class BayesNet():
                 if '~' in b: # not p
                     if '~' in c: # not s
                         if '~' in a:
-                            return node_a.conditional['~p~s']
+                            #return node_a.conditional['~p~s']
                             return 1-node_a.conditional['~p~s']
                         else:
                             return node_a.conditional['~p~s']
                     else: # s
                         if '~' in a:
-                            return node_a.conditional['~ps']
+                            #return node_a.conditional['~ps']
                             return 1-node_a.conditional['~ps']
                         else:
                             return node_a.conditional['~ps']
                 else: # p
                     if '~' in c: # not s
                         if '~' in a:
-                            return node_a.conditional['p~s']
+                            #return node_a.conditional['p~s']
                             return 1-node_a.conditional['p~s']
                         else:
                             return node_a.conditional['p~s']
                     else: # s
                         if '~' in a:
-                            return node_a.conditional['ps']
+                            #return node_a.conditional['ps']
                             return 1-node_a.conditional['ps']
                         else:
                             return node_a.conditional['ps']
@@ -301,13 +301,13 @@ class BayesNet():
             for i in b:
                 if self.graph[i].parents is not None and len(self.graph[i].parents) > 0:
                     p *= self.calcConditional(i,''.join([b.letter for b in self.graph[i].parents]))
-                    print("{0} | {1} = {2}".format(i,''.join([b.letter for b in self.graph[i].parents]),self.calcConditional(i,''.join([b.letter for b in self.graph[i].parents]))))
+                    #print("{0} | {1} = {2}".format(i,''.join([b.letter for b in self.graph[i].parents]),self.calcConditional(i,''.join([b.letter for b in self.graph[i].parents]))))
                     #print p
                 else:
-                    print i
+                    #print i
                     p *= self.calcMarginal(i)
                     #print p
-            print p
+            #print p
             return p
 
         ret = 0
@@ -368,8 +368,8 @@ class BayesNet():
                     final_list[i] = '~' + node_order[i]
             #print final_list
             ret += jointHelper(final_list)
-        print ret
-        print ""
+        #print ret
+        #print ""
         return ret 
 
 def main():
