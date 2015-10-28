@@ -234,34 +234,44 @@ class BayesNet():
 
         binary_ops = {}
         binary = 00001
+        node_order = []
         for x in (a + notInJoint):
             binary_ops[x] = binary
+            node_order.append(x)
             binary = binary << 1
-        print binary_ops
+        #print binary_ops
         permutations = ["".join(seq) for seq in itertools.product("01", repeat=5)]
-        print notInJoint
+        #print notInJoint
         p = []
         final_bits = []
+        # convert to int
         for i in range(len(permutations)):
             p.append(int(permutations[i],2))
-        for i in range(len(permutations)):
+
+        # find bits
+        for i in range(len(p)):
             for j in a:
                 p[i] = p[i] | binary_ops[j]
             final_bits.append(p[i])
-        # if we have a 0 in bits
         final_bits = set(final_bits)
-        print final_bits
+        #print final_bits
+        #print len(final_bits)
+
+        # Make list of out bits
+        node_order.reverse()
+        string_list = []
+        final_list = [0,0,0,0,0]
         for interger in final_bits:
-            i = 10000
-            string = "{0:b}".format(interger)
-            for c in string:
-                for name, age in list.iteritems():
-                    if age == search_age:
-                        print name
-                if c = '1':
-                    pass
-                if c = '0':
-                    pass
+            string = "{0:05b}".format(interger)
+            string_list = list(string)
+            #print string
+            for i in range(len(string)):
+                if string_list[i] == '1':
+                    final_list[i] = node_order[i]
+                elif string_list[i] == '0':
+                    final_list[i] = '~' + node_order[i]
+            #print final_list
+            ret += jointHelper(final_list)
         """        
         for combo in itertools.permutations(notInJoint,length):
             copy = set(list(s.replace('~','') for s in combo))
