@@ -345,6 +345,31 @@ def callJoint(a,net):
     print('Joint of {0} = {1}'.format(a,net.calcJoint(a)))
     return
 
+def callConditional(a,b,net):
+    b = convertToArray(b)
+    b_clean = list(set(str(node).replace('~','') for node in b))
+    b_clean = filter(None,b_clean)
+    for i in range(len(b)):
+        if b_clean[i].isupper():
+            b_clean[i] = b_clean[i].lower()
+            str1 = ''.join(b[:i]+[b_clean[i]]+b[i+1:])
+            b_clean[i] = '~' + b_clean[i] 
+            str2 = ''.join(b[:i]+[b_clean[i]]+b[i+1:])
+            #print str1
+            #print str2
+            callConditional(a,str1,net)
+            callConditional(a,str2,net)
+            return
+        else:
+            pass
+    #print a
+    b = ''.join(b)
+    if a.isupper:
+        print('{0}|{1} = {2}'.format('~'+a.lower(),b,net.calcConditional('~'+a.lower(),b)))
+    print('{0}|{1} = {2}'.format(a.lower(),b,net.calcConditional(a.lower(),b)))
+
+    return
+
 def main():
     p_print = 1
     try:
@@ -383,7 +408,8 @@ def main():
             p = a.find("|")
             print a[:p]
             print a[p+1:]
-            print net.calcConditional(a[:p], a[p+1:])
+            callConditional(a[:p],a[p+1:],net)
+            #print net.calcConditional(a[:p], a[p+1:])
         elif o in ("-j"):
             print "flag", o
             print "args", a
