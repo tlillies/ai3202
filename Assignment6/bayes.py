@@ -323,6 +323,28 @@ class BayesNet():
         #print ""
         return ret 
 
+def callJoint(a,net):
+    a = convertToArray(a)
+    a_clean = list(set(str(node).replace('~','') for node in a))
+    a_clean = filter(None,a_clean)
+    for i in range(len(a)):
+        if a_clean[i].isupper():
+            a_clean[i] = a_clean[i].lower()
+            str1 = ''.join(a[:i]+[a_clean[i]]+a[i+1:])
+            a_clean[i] = '~' + a_clean[i] 
+            str2 = ''.join(a[:i]+[a_clean[i]]+a[i+1:])
+            #print str1
+            #print str2
+            callJoint(str1,net)
+            callJoint(str2,net)
+            return
+        else:
+            pass
+    #print a
+    a = ''.join(a)
+    print('Joint of {0} = {1}'.format(a,net.calcJoint(a)))
+    return
+
 def main():
     p_print = 1
     try:
@@ -365,7 +387,9 @@ def main():
         elif o in ("-j"):
             print "flag", o
             print "args", a
-            print net.calcJoint(convertToArray(a))
+            callJoint(a,net)
+
+            #print net.calcJoint(convertToArray(a))
             """
             for i in range(0,len(a)):
                 if a[i].isupper:
