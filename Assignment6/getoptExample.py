@@ -131,7 +131,8 @@ class BayesNet():
                         return node_a.conditional['p~s']
                     else: # s
                         return node_a.conditional['ps']
-
+        #print a+b
+        #print b
         #print self.calcJoint(a+b)
         #print self.calcJoint(b)
         return self.calcJoint(a+b)/self.calcJoint(b)
@@ -225,16 +226,50 @@ class BayesNet():
         ret = 0
         notInJoint = []
         notInJoint =  list(set([str(s).replace('~','') for s in self.graph.keys()]))
-        for i in notInJoint:
-            if i in a:
+        for i in a:
+            if i in notInJoint:
                 notInJoint.remove(i)
 
         length = len(notInJoint)
+
+        binary_ops = {}
+        binary = 00001
+        for x in (a + notInJoint):
+            binary_ops[x] = binary
+            binary = binary << 1
+        print binary_ops
+        permutations = ["".join(seq) for seq in itertools.product("01", repeat=5)]
+        print notInJoint
+        p = []
+        final_bits = []
+        for i in range(len(permutations)):
+            p.append(int(permutations[i],2))
+        for i in range(len(permutations)):
+            for j in a:
+                p[i] = p[i] | binary_ops[j]
+            final_bits.append(p[i])
+        # if we have a 0 in bits
+        final_bits = set(final_bits)
+        print final_bits
+        for interger in final_bits:
+            i = 10000
+            string = "{0:b}".format(interger)
+            for c in string:
+                for name, age in list.iteritems():
+                    if age == search_age:
+                        print name
+                if c = '1':
+                    pass
+                if c = '0':
+                    pass
+        """        
         for combo in itertools.permutations(notInJoint,length):
             copy = set(list(s.replace('~','') for s in combo))
             if len(copy) == length:
+                print a+list(combo)
+                #print combo
                 ret += jointHelper(a+list(combo))
-                                                                                                                            
+        """                                                                                                                    
         return ret 
 
 def main():
