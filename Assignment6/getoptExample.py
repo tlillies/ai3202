@@ -1,4 +1,4 @@
-import getopt, sys
+import getopt, sys, operator, itertools
 ###############################################
 #                                             #
 #  WARNING: This code is very gross...sorry!  #
@@ -103,8 +103,39 @@ class BayesNet():
     def calcConditionalExtended(self,a,b):
         node_a = self.graph[a]
         b_list = convertToArray(b)
-        node_b = self.graph[b_list[0]]
-        node_c = self.graph[b_list[1]]
+        b = b_list[0]
+        c = b_list[1]
+        node_b = self.graph[b]
+        node_c = self.graph[c]
+
+        if node_a.letter == 'c':
+            if node_b.letter == 's' and node_c.letter == 'p':
+                if '~' in b: # not s
+                    if '~' in c: # not p
+                        return node_a.conditional['~p~s']
+                    else: # p 
+                        return node_a.conditional['p~s']
+                else: # s
+                    if '~' in c: # not p
+                        return node_a.conditional['~ps']
+                    else: # p
+                        return node_a.conditional['ps']
+            if node_c.letter == 's' and node_b.letter == 'p':
+                if '~' in b: # not p
+                    if '~' in c: # not s
+                        return node_a.conditional['~p~s']
+                    else: # s
+                        return node_a.conditional['~ps']
+                else: # p
+                    if '~' in c: # not s
+                        return node_a.conditional['p~s']
+                    else: # s
+                        return node_a.conditional['ps']
+
+        #print self.calcJoint(a+b)
+        #print self.calcJoint(b)
+        return self.calcJoint(a+b)/self.calcJoint(b)
+        """
         if node_a.letter == node_b.letter:
             return 1
         if node_a.letter == node_c.letter:
@@ -121,6 +152,7 @@ class BayesNet():
                     return self.calcConditional(a,b_list[1])
                 else:
                     pass
+        """
         return 0
 
     def calcConditional(self,a,b):
@@ -178,10 +210,32 @@ class BayesNet():
             prob = self.calcConditional(a,'c')*self.calcConditional('c',b)+self.calcConditional(a,'~c')*self.calcConditional('~c',b)
             return prob
 
-    
-            
+
     def calcJoint(self,a):
-        return
+        a = convertToArray(a)
+        def jointHelper(b):
+            p = 1
+            for i in b:
+                if self.graph[i].parents is not None and len(self.graph[i].parents) > 0:
+                    p *= self.calcConditional(i,''.join([b.letter for b in self.graph[i].parents]))
+                else:
+                    p *= self.calcMarginal(i)
+            return p
+
+        ret = 0
+        notInJoint = []
+        notInJoint =  list(set([str(s).replace('~','') for s in self.graph.keys()]))
+        for i in notInJoint:
+            if i in a:
+                notInJoint.remove(i)
+
+        length = len(notInJoint)
+        for combo in itertools.permutations(notInJoint,length):
+            copy = set(list(s.replace('~','') for s in combo))
+            if len(copy) == length:
+                ret += jointHelper(a+list(combo))
+                                                                                                                            
+        return ret 
 
 def main():
     p_print = 1
@@ -225,6 +279,7 @@ def main():
         elif o in ("-j"):
             print "flag", o
             print "args", a
+            print net.calcJoint(convertToArray(a))
             """
             for i in range(0,len(a)):
                 if a[i].isupper:
