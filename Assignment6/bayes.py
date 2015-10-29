@@ -13,6 +13,7 @@ class Node():
         self.children = None
         self.conditional = {}
         self.letter = letter
+        self.letter_full = letter
 
 def convertToArray(string):
     array = []
@@ -55,14 +56,19 @@ def makeGraph():
 
     graph['p'] = P
     graph['~p'] = P
+    graph['~p'].letter_full = '~p'
     graph['d'] = D
     graph['~d'] = D
+    graph['~d'].letter_full = '~d'
     graph['c'] = C
     graph['~c'] = C
+    graph['~c'].letter_full = '~c'
     graph['x'] = X
     graph['~x'] = X
+    graph['~x'].letter_full = '~x'
     graph['s'] = S
     graph['~s'] = S
+    graph['~s'].letter_full = '~s'
 
     return graph
 
@@ -248,10 +254,27 @@ class BayesNet():
         a = list(set(a))
         def jointHelper(b): # Do the actual calculation given the list
             p = 1
-            #print b
+            # print b
+            abcd = b
             for i in b:
                 if self.graph[i].parents is not None and len(self.graph[i].parents) > 0:
-                    p *= self.calcConditional(i,''.join([b.letter for b in self.graph[i].parents]))
+                    
+                    temp = [b.letter for b in self.graph[i].parents]
+                    new = []
+                    for node in temp:
+                        for org in abcd:
+                            if self.graph[org].letter == node:
+                                if '~' in org:
+                                    #print "TEST"
+                                    #print org
+                                    new.append(org)
+                                    #print node
+                                else:
+                                    new.append(node)
+                    #print new
+                    
+                    p *= self.calcConditional(i,''.join(new))
+                    #p *= self.calcConditional(i,''.join([b.letter for b in self.graph[i].parents]))
                     #print("{0} | {1} = {2}".format(i,''.join([b.letter for b in self.graph[i].parents]),self.calcConditional(i,''.join([b.letter for b in self.graph[i].parents]))))
                     #print p
                 else:
@@ -364,7 +387,7 @@ def callConditional(a,b,net):
             pass
     #print a
     b = ''.join(b)
-    if a.isupper:
+    if a.isupper():
         print('{0}|{1} = {2}'.format('~'+a.lower(),b,net.calcConditional('~'+a.lower(),b)))
     print('{0}|{1} = {2}'.format(a.lower(),b,net.calcConditional(a.lower(),b)))
 
