@@ -1,9 +1,15 @@
 import helpers
+from random import random
 
 print("Rejection Sampling\n")
 
-raw_samples = helpers.getSamples()
+#raw_samples = helpers.getSamples()
 samples = []
+
+raw_samples = []
+for x in range(100000):
+    raw_samples.append(random())
+
 
 for i in range(len(raw_samples)):
     if (i) % 4 == 0:
@@ -17,16 +23,16 @@ for i in range(len(raw_samples)):
 
 test = []
 for sample in samples:
-    test.append(helpers.check(sample))
+    test.append(helpers.priorCheck(sample))
 
 
 #### P(c = true) ####
 count = 0.0
 for sample in raw_samples:
-    if sample  =< C_TRUE:
+    if sample <= helpers.C_TRUE:
         count += 1
 
-value = count/len(test)
+value = count/len(raw_samples)
 print('P(c = true) = {0}'.format(value))
 
 
@@ -34,9 +40,26 @@ print('P(c = true) = {0}'.format(value))
 value = 0.0
 count = 0.0
 count_total = 0.0
-for sample in test:
-    if sample['r'] == True:
-        if sample['c'] == True:
+for i in range(0,len(raw_samples),2):
+    c = raw_samples[i]
+    r = raw_samples[i+1]
+
+    if c <= helpers.C_TRUE:
+        c = True
+    else:
+        c = False
+
+    if r <= helpers.R_TRUE_C_TRUE and c == True:
+        r = True
+    elif r > helpers.R_TRUE_C_TRUE and c == True:
+        r = False
+    elif r <= helpers.R_TRUE_C_FALSE and c == False:
+        r = True
+    elif r > helpers.R_TRUE_C_FALSE and c == False:
+        r = False
+
+    if r == True:
+        if c  == True:
             count += 1
         count_total += 1
 
@@ -45,6 +68,7 @@ print('P(c = true | r = true) = {0}'.format(value))
 
 
 #### P(s = true | w = true) ####
+# Same as prior
 value = 0.0
 count = 0.0
 count_total = 0.0
@@ -58,6 +82,7 @@ value = count/count_total
 print('P(s = true | w = true) = {0}'.format(value))
 
 #### P(s = true | c = true, w = true) ####
+# same as prior
 value = 0.0
 count = 0.0
 count_total = 0.0
