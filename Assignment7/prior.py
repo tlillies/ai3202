@@ -1,9 +1,14 @@
 import helpers
+from random import random
 
 print("Prior Sampling\n")
 
-raw_samples = helpers.getSamples()
+#raw_samples = helpers.getSamples()
 samples = []
+
+raw_samples = []
+for x in range(10000000):
+    raw_samples.append(random())
 
 for i in range(len(raw_samples)):
     if (i) % 4 == 0:
@@ -17,7 +22,7 @@ for i in range(len(raw_samples)):
 
 test = []
 for sample in samples:
-    test.append(helpers.check(sample))
+    test.append(helpers.priorCheck(sample))
 
 
 #### P(c = true) ####
@@ -56,6 +61,7 @@ for sample in test:
 
 value = count/count_total
 print('P(s = true | w = true) = {0}'.format(value))
+
 
 #### P(s = true | c = true, w = true) ####
 value = 0.0
