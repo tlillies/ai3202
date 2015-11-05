@@ -23,8 +23,6 @@ for i in range(len(raw_samples)):
 test = []
 num = 0
 for sample in samples:
-    print num
-    print sample
     num += 1
     test.append(helpers.priorCheck(sample))
 
@@ -70,16 +68,12 @@ print('P(s = true | w = true) = {0}'.format(value))
 #### P(s = true | c = true, w = true) ####
 value = 0.0
 count = 0.0
-lol = 0
 count_total = 0.0
 for sample in test:
     if sample['c'] == True and sample['w'] == True:
         if sample['s'] == True:
             count += 1
-            print sample
-            print lol
         count_total += 1
-    lol += 1
 
 value = count/count_total
 print('P(s = true | c = true, w = true) = {0}'.format(value))
