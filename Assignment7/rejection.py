@@ -3,13 +3,13 @@ from random import random
 
 print("Rejection Sampling\n")
 
-#raw_samples = helpers.getSamples()
+raw_samples = helpers.getSamples()
 samples = []
-
+"""
 raw_samples = []
 for x in range(100000):
     raw_samples.append(random())
-
+"""
 
 for i in range(len(raw_samples)):
     if (i) % 4 == 0:

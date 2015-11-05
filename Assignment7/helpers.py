@@ -13,7 +13,7 @@ W_TRUE_S_FALSE_R_FALSE = 0.00
 
 def priorCheck(sample):
     ret =  {}
-    if sample['c'] <= C_TRUE:
+    if sample['c'] < C_TRUE:
         ret['c'] = True
         s_test = S_TRUE_C_TRUE
         r_test = R_TRUE_C_TRUE
@@ -22,13 +22,12 @@ def priorCheck(sample):
         s_test = S_TRUE_C_FALSE
         r_test = R_TRUE_C_FALSE
 
-
-    if sample['s'] <= s_test:
+    if sample['s'] < s_test:
         ret['s'] = True
     else:
         ret['s'] = False
 
-    if sample['r'] <= r_test:
+    if sample['r'] < r_test:
         ret['r'] = True
     else:
         ret['r'] = False
@@ -42,11 +41,10 @@ def priorCheck(sample):
     if ret['r'] == False and ret['s'] == False:
         w_test = W_TRUE_S_FALSE_R_FALSE
 
-    if sample['w'] <= w_test:
+    if sample['w'] < w_test:
         ret['w'] = True
     else:
         ret['w'] = False
-
     return ret
 
 def getSamples():
