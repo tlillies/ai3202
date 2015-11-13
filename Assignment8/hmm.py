@@ -31,14 +31,22 @@ class HMM:
         # fill with input file
         f = open(input_file)
         i_size = 0
-        for line in f:
-            self.initial[line[0]] += 1.0
-            self.emission[line[0]][line[2]] += 1.0
-            try:
-                self.transition[line[0]][(f.next())[0]] += 1.0
-            except:
-                pass
-
+        previous_line = None
+        while True:
+            line1 = f.readline() # read in two lines at a time
+            line2 = f.readline()
+            if not line1: break  # EOF
+            if previous_line:
+                self.transition[previous_line[0]][line1[0]] += 1.0
+            self.initial[line1[0]] += 1.0
+            self.emission[line1[0]][line1[2]] += 1.0
+            i_size += 1.0
+            
+            if not line2: break  # EOF
+            self.emission[line2[0]][line2[2]] += 1.0
+            self.initial[line2[0]] += 1.0
+            self.transition[line1[0]][line2[0]] += 1.0
+            previous_line = line2
             i_size += 1.0
 
         # calculate probablities
@@ -75,7 +83,7 @@ class HMM:
 
         print("###########################################")
         print("MARGINAL:")
-        for key in self.initial:
+        for key in self.alphabet:
             print("P({0}) = {1:.6f}".format(key,self.initial[key]))
 
 
