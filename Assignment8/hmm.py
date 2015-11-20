@@ -1,4 +1,5 @@
 from string import ascii_lowercase
+import math
 
 class HMM:
     def __init__(self,input_file):
@@ -71,7 +72,7 @@ class HMM:
         print("")
         for key in self.alphabet:
             for key2 in self.alphabet:
-                print("P({0} | {1}) = {2:.6f}".format(key2,key,self.table[key][key2]['emission']))
+                print("P({0} | {1}) = {2}".format(key2,key,self.table[key][key2]['emission']))
 
         print("###########################################")
         print("TRANSITIONAL:")
@@ -79,13 +80,72 @@ class HMM:
         print("")
         for key in self.alphabet:
             for key2 in self.alphabet:
-                print("P({0} | {1}) = {2:.6f}".format(key2,key,self.table[key][key2]['transition']))
+                print("P({0} | {1}) = {2}".format(key2,key,self.table[key][key2]['transition']))
 
         print("###########################################")
         print("MARGINAL:")
         for key in self.alphabet:
-            print("P({0}) = {1:.6f}".format(key,self.initial[key]))
+            print("P({0}) = {1}".format(key,self.initial[key]))
 
+    def viterbi(self,input_file):
+        f = open(input_file)
+        outputs = []
+        states_list = []
+        viterbi = []
+        for line in f:
+            if line[0] in self.alphabet:
+                states_list.append(line[0])
+                outputs.append(line[2])
+        
+        solution = []
+        max_sol = []
+        for x in range(len(states_list)):
+            states = {}
+            states_2 = {}
+            for c in self.alphabet:
+                states[c] = {}
+            solution.append(states)
+            max_sol.append(states_2)
+
+
+        stateNum = 0
+        firstState = True
+        for observed in outputs:
+            if firstState == True:
+                for state in self.alphabet:
+                    max_sol[stateNum][state] = math.log(self.table[state][observed]['emission']) + math.log(self.initial[state])
+                firstState = False
+            else:
+                for state in self.alphabet:
+                    for previousState in self.alphabet:
+                        #print max_sol[stateNum-1][previousState]
+                        solution[stateNum][state][previousState] = math.log(self.table[state][observed]['emission']) +\
+                            math.log(self.table[previousState][state]['transition']) +\
+                            max_sol[stateNum-1][previousState]
+                    max_sol[stateNum][state] = max(solution[stateNum][state].values())
+            stateNum += 1
+
+        for i in range(stateNum-1,-1,-1):
+            state = max(max_sol[i], key=max_sol[i].get)
+            viterbi = [state] + viterbi
+
+        count = 0.0
+        for i in range(len(outputs)):
+            if outputs[i] != states_list[i]:
+                count += 1
+        print("Before Viterbi {0}% error".format(count/len(outputs)*100))
+        count = 0.0
+        for i in range(len(viterbi)):
+            if viterbi[i] != states_list[i]:
+                count += 1
+        print("After Viterbi {0}% error".format(count/len(viterbi)*100))
+
+        output_f = open('viterbi.txt','w')
+        for i in range(len(viterbi)):
+            output_f.write(viterbi[i])
+            output_f.write('\n')
+        output_f.close()
 
 hmm = HMM('typos20.data')
-hmm.printHMM()
+hmm.viterbi('typos20Test.data')
+#hmm.printHMM()
