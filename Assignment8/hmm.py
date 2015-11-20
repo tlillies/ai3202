@@ -147,5 +147,5 @@ class HMM:
         output_f.close()
 
 hmm = HMM('typos20.data')
-hmm.viterbi('typos20Test.data')
-#hmm.printHMM()
+#hmm.viterbi('typos20Test.data')
+hmm.printHMM()
