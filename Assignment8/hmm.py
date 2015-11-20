@@ -89,45 +89,6 @@ class HMM:
             print("P({0}) = {1}".format(key,self.initial[key]))
 
     def viterbi(self,input_file):
-        """
-        observed = []
-        correct = []
-        path = {}
-
-        f = open(input_file)
-        for line in f:
-            if line[0] in self.alphabet:
-                correct.append(line[0])
-                observed.append(line[2])
-
-        f.close()
-
-        memo = [{} for i in xrange(len(observed))]
-
-        for state in self.alphabet:
-            path[state] = [state]
-            memo[0][state] = math.log(self.initial[state]) + math.log(self.table[observed[0]][state]['emission'])
-
-
-        for i in xrange(1,len(observed)):
-            nuPath = {}
-
-            for state in self.alphabet:
-                (prob, st)  = max((memo[i-1][e] + math.log(self.table[e][state]['transition']) + math.log(self.table[state][observed[i]]['emission']),e) for e in self.alphabet)
-                memo[i][state] = prob
-                nuPath[state] = path[st] + [state]
-
-            path = nuPath
-        n = len(observed) - 1
-        (prob, state) = max((memo[n][y], y) for y in self.alphabet)
-        differencesnum = 0.0
-        for x,y in zip(path[state],correct):
-            if x is y:
-                pass
-            else:
-                differencesnum += 1.
-        print differencesnum/len(path[state])
-        """
         f = open(input_file)
         outputs = []
         states_list = []
