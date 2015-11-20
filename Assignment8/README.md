@@ -2,6 +2,6 @@ How to run:
 
 python hmm.py
 
-or to read to file:
+or to write to file:
 
 python hmm.py > results.txt

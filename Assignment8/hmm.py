@@ -1,5 +1,6 @@
 from string import ascii_lowercase
 import math
+import operator
 
 class HMM:
     def __init__(self,input_file):
@@ -42,7 +43,7 @@ class HMM:
             self.initial[line1[0]] += 1.0
             self.emission[line1[0]][line1[2]] += 1.0
             i_size += 1.0
-            
+
             if not line2: break  # EOF
             self.emission[line2[0]][line2[2]] += 1.0
             self.initial[line2[0]] += 1.0
@@ -88,15 +89,57 @@ class HMM:
             print("P({0}) = {1}".format(key,self.initial[key]))
 
     def viterbi(self,input_file):
+        """
+        observed = []
+        correct = []
+        path = {}
+
+        f = open(input_file)
+        for line in f:
+            if line[0] in self.alphabet:
+                correct.append(line[0])
+                observed.append(line[2])
+
+        f.close()
+
+        memo = [{} for i in xrange(len(observed))]
+
+        for state in self.alphabet:
+            path[state] = [state]
+            memo[0][state] = math.log(self.initial[state]) + math.log(self.table[observed[0]][state]['emission'])
+
+
+        for i in xrange(1,len(observed)):
+            nuPath = {}
+
+            for state in self.alphabet:
+                (prob, st)  = max((memo[i-1][e] + math.log(self.table[e][state]['transition']) + math.log(self.table[state][observed[i]]['emission']),e) for e in self.alphabet)
+                memo[i][state] = prob
+                nuPath[state] = path[st] + [state]
+
+            path = nuPath
+        n = len(observed) - 1
+        (prob, state) = max((memo[n][y], y) for y in self.alphabet)
+        differencesnum = 0.0
+        for x,y in zip(path[state],correct):
+            if x is y:
+                pass
+            else:
+                differencesnum += 1.
+        print differencesnum/len(path[state])
+        """
         f = open(input_file)
         outputs = []
         states_list = []
-        viterbi = []
+        vitierbi = []
+
+        path = {}
+
         for line in f:
             if line[0] in self.alphabet:
                 states_list.append(line[0])
                 outputs.append(line[2])
-        
+
         solution = []
         max_sol = []
         for x in range(len(states_list)):
@@ -114,25 +157,33 @@ class HMM:
             if firstState == True:
                 for state in self.alphabet:
                     max_sol[stateNum][state] = math.log(self.table[state][observed]['emission']) + math.log(self.initial[state])
+                    path[state] = [state]
                 firstState = False
             else:
+                new_path = {}
                 for state in self.alphabet:
                     for previousState in self.alphabet:
                         #print max_sol[stateNum-1][previousState]
                         solution[stateNum][state][previousState] = math.log(self.table[state][observed]['emission']) +\
-                            math.log(self.table[previousState][state]['transition']) +\
-                            max_sol[stateNum-1][previousState]
-                    max_sol[stateNum][state] = max(solution[stateNum][state].values())
+                                math.log(self.table[previousState][state]['transition']) +\
+                                max_sol[stateNum-1][previousState]
+                        (st,prob) = max(solution[stateNum][state].iteritems(), key=operator.itemgetter(1))
+                    max_sol[stateNum][state] = prob
+                    new_path[state] = path[st] + [state]
+                path = new_path
             stateNum += 1
 
-        for i in range(stateNum-1,-1,-1):
-            state = max(max_sol[i], key=max_sol[i].get)
-            viterbi = [state] + viterbi
-
+        (p,s) = max((max_sol[len(outputs)-1][y],y) for  y in self.alphabet)
+        viterbi = path[s]
         count = 0.0
         for i in range(len(outputs)):
             if outputs[i] != states_list[i]:
                 count += 1
+
+        print("State Sequence:")
+        for i in range(len(viterbi)):
+            print(viterbi[i])
+
         print("Before Viterbi {0}% error".format(count/len(outputs)*100))
         count = 0.0
         for i in range(len(viterbi)):
@@ -140,12 +191,7 @@ class HMM:
                 count += 1
         print("After Viterbi {0}% error".format(count/len(viterbi)*100))
 
-        output_f = open('viterbi.txt','w')
-        for i in range(len(viterbi)):
-            output_f.write(viterbi[i])
-            output_f.write('\n')
-        output_f.close()
-
+        
 hmm = HMM('typos20.data')
-#hmm.viterbi('typos20Test.data')
-hmm.printHMM()
+hmm.viterbi('typos20Test.data')
+#hmm.printHMM()
